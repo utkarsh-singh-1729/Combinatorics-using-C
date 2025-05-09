@@ -2,7 +2,7 @@
 
 void meow(int i);
 int main(void){
-    printf("Enter the number :");
+    printf("Enter the number(times) :");
     int i = scanf("%i");
     meow(i);
 }
