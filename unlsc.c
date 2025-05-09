@@ -1,0 +1,227 @@
+#include<iostream>
+#include <vector>
+using namespace std;
+class Point {
+	public:
+           int x,y;
+	void setPoint(int m,int n){
+	    x=m;
+		y=n;
+	}
+	Point(){};
+};
+class State {
+	public:
+           Point p[9];
+	       int length;
+
+	void setState(State s){
+		for(int i=0;i<s.length;i++){
+			p[i].setPoint(s.p[i].x,s.p[i].y);
+		}
+		length=s.length;
+	}
+	State(){};
+};
+vector<State> array1;
+vector<State> array2;
+vector<State> array3;
+int pointslength;
+Point* getAvailablePoints(State s){
+    bool flag[3][3];//true:NOT available
+    int i,j;
+
+    for(i=0;i<3;i++)
+    {
+        for(j=0;j<3;j++)
+        {
+            flag[i][j]=false;
+        }
+    }
+    for(i=0;i<s.length;i++){
+        flag[s.p[i].x][s.p[i].y]=true;
+    }
+    Point last=s.p[s.length-1];
+    //deal with 4 diagonal condition
+    if(last.x==0 && last.y==0 && !flag[1][1]){
+        flag[2][2]=true;
+    }
+    if(last.x==2 && last.y==2 && !flag[1][1]){
+        flag[0][0]=true;
+    }
+    if(last.x==0 && last.y==2 && !flag[1][1]){
+        flag[2][0]=true;
+    }
+    if(last.x==2 && last.y==0 && !flag[1][1]){
+        flag[0][2]=true;
+    }
+    //deal with 12 straight condition
+    if(last.x==0 && last.y==0 && !flag[0][1]){
+        flag[0][2]=true;
+    }
+    if(last.x==0 && last.y==2 && !flag[0][1]){
+        flag[0][0]=true;
+    }
+    if(last.x==0 && last.y==0 && !flag[1][0]){
+        flag[2][0]=true;
+    }
+    if(last.x==2 && last.y==0 && !flag[1][0]){
+        flag[0][0]=true;
+    }
+    if(last.x==2 && last.y==2 && !flag[1][2]){
+        flag[0][2]=true;
+    }
+    if(last.x==0 && last.y==2 && !flag[1][2]){
+        flag[2][2]=true;
+    }
+    if(last.x==2 && last.y==2 && !flag[2][1]){
+        flag[2][0]=true;
+    }
+    if(last.x==2 && last.y==0 && !flag[2][1]){
+        flag[2][2]=true;
+    }
+    if(last.x==0 && last.y==1 && !flag[1][1]){
+        flag[2][1]=true;
+    }
+    if(last.x==2 && last.y==1 && !flag[1][1]){
+        flag[0][1]=true;
+    }
+    if(last.x==1 && last.y==0 && !flag[1][1]){
+        flag[1][2]=true;
+    }
+    if(last.x==1 && last.y==2 && !flag[1][1]){
+        flag[1][0]=true;
+    }
+    //return a new array
+    int count=0;
+    for(int i=0;i<3;i++){
+        for(int j=0;j<3;j++){
+            if(!flag[i][j])
+                count++;
+    }
+
+    }
+    Point* re=new Point[count];
+    count=0;
+    for(i=0;i<3;i++){
+        for(j=0;j<3;j++){
+        if(!flag[i][j]){
+            re[count].setPoint(i,j);
+            count++;
+    }
+    }
+    }
+    pointslength = count;
+    return re;
+    }
+
+int* bfs(vector<State> myarray){
+    int count=0;
+    int* re=new int[10];
+	for(int i=0; i<10; i++)
+		re[i] = 0;
+    while(count< myarray.size()){
+        State s=myarray[count];
+        Point* points=getAvailablePoints(s);
+        for(int i=0;i<pointslength;i++){
+            State newS;
+            newS.setState(s);
+            newS.p[s.length]=points[i];
+            newS.length=s.length+1;
+            myarray.push_back(newS);
+		}
+		count++;
+		re[s.length]++;
+    }
+    re[0]=count;
+    return re;
+}
+
+void compute(int x, int y)
+{
+	State s1;
+	s1.p[0].setPoint(x,y);
+    s1.length=1;
+
+    array1.push_back(s1);
+
+    int* count1=bfs(array1);
+    count1[1]=1 ;
+    cout<<"------------------------"<<endl;
+    cout<<100000000"<<endl;
+    for(int i=1;i<10;i++){
+        //cout<<i<<" "<<count1[i]<<endl;
+        //cout<<i<<"1234434 "<<count1[i]<<" 个"<<endl;
+		cout<< "The "<<i<< " step gesture has "<<count1[i]<<" solutions\n";
+    }
+}
+
+void analysis()
+{
+
+	//start from corner ((0,0) or (0,2) or (2,0) or (2,2))
+	State s1;
+	s1.p[0].setPoint(0,0);
+    s1.length=1;
+
+    array1.push_back(s1);
+
+    int* count1=bfs(array1);
+    count1[1]=1 ;
+
+     //start from edge((0,1) or (1,0) or (2,1) or (1,2))
+    State s2;
+
+    s2.p[0].setPoint(0,1);
+    s2.length=1;
+
+    array2.push_back(s2);
+
+    int* count2=bfs(array2);
+    count2[1]=1 ;
+
+    //start from inner((1,1))
+    State s3;
+
+    s3.p[0].setPoint(1,1);
+    s3.length=1;
+
+    array3.push_back(s3);
+
+    int* count3=bfs(array3);
+    count3[1]=1 ;
+    cout<<"------------------------"<<endl;
+    cout<<"Results："<<endl;
+    for(int i=1;i<10;i++){
+		cout<< "The "<<i<< " step gesture has "<<count1[i]*4+count2[i]*4+count3[i]<<" solutions\n";
+    }
+
+}
+
+
+int main()
+{
+	cout<<"------------------------"<<endl;
+    cout<<"|Screen Unlock solutions|"<<endl;
+    cout<<"------------------------"<<endl;
+    int in;
+    cout << "Please secelt: 1.Input the start point and get the solutions 2. Strictly show all possible solutions" <<endl;
+	cin>>in;
+    switch(in)
+        {
+           case 1:{
+           	    int x;
+           	    int y;
+           	    cout<<"x = ";
+           	    cin>>x;
+           	    cout<<"y = ";
+           	    cin>>y;
+           	    compute(x,y);
+           };break;
+           case 2:analysis();break;
+           default:cout<<"Invid Output"<<endl;
+        }
+
+	system("pause");
+	return 0;
+}
